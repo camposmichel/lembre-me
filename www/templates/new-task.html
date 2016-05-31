@@ -1,0 +1,37 @@
+<ion-view view-title="Nova tarefa" ng-init="setDateToToday()">
+	<ion-content>
+
+		<div class="list">
+			<label class="item item-input item-stacked-label">
+				<input type="text" placeholder="Titulo" ng-model="newTask.title">
+			</label>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Início</span>
+				<input type="date" placeholder="Início" ng-model="newTask.startDate">
+			</label>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Fim</span>
+				<input type="date" placeholder="Fim" ng-model="newTask.endDate">
+			</label>
+
+			<label class="item item-input item-select">
+				<div class="input-label">
+					Prioridade
+				</div>
+				<select ng-model="newTask.priority">
+					<option value="1" ng-selected="true">Baixa</option>
+					<option value="2">Média</option>
+					<option value="3">Alta</option>
+				</select>
+			</label>
+
+			<label class="item item-input item-stacked-label">
+				<input type="text" placeholder="Detalhes" ng-model="newTask.details">
+			</label>
+		</div>
+		<div class="content padding ">
+			<button class="button button-block button-balanced" ng-click="addNewTask();">Adicionar</button>
+		</div>
+
+	</ion-content>
+</ion-view>
