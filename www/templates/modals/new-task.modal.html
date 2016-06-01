@@ -1,0 +1,46 @@
+<ion-modal-view>
+	<ion-header-bar class="bar bar-header bar-dark">
+		<button class="button button-icon icon ion-close" ng-click="modalNewtask.hide();"></button>
+		<h1 class="title">Nova tarefa</h1>
+	</ion-header-bar>
+	<ion-content ng-controller="AdminTasksController">
+		<div class="list">
+			<label class="item item-input">
+				<input type="text" placeholder="Título">
+			</label>
+			<label class="item item-input">
+				<span class="input-label">Início</span>
+				<input type="date">
+			</label>
+			<label class="item item-input">
+				<span class="input-label">Fim</span>
+				<input type="date">
+			</label>
+			<label class="item item-input">
+				<textarea placeholder="Descrição"></textarea>
+			</label>
+
+			<label class="item item-input item-select">
+				<div class="input-label">
+				Categoria
+				</div>
+				<select>
+					<option>Casa</option>
+					<option>Trabalho</option>
+					<option>Faculdade</option>
+				</select>
+			</label>
+
+			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">
+			Crie uma nova categoria para suas tarefas
+			</button>
+		</div>
+
+
+		<div class="bar bar-footer bar-balanced" ng-click="testemichel();">
+			<div class="title">
+				<i class="icon ion-archive" style="font-size:45px;"></i>
+			</div>
+		</div>
+	</ion-content>
+</ion-modal-view>
