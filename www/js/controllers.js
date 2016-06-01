@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('TasksController', function($scope, Tasks, $ionicListDelegate, $cordovaCalendar) {
+.controller('TasksController', function($scope, Tasks, $ionicListDelegate, $cordovaCalendar, $location) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -29,6 +29,10 @@ angular.module('starter.controllers', [])
 
   $scope.testemichel = function(){
     alert('OK');
+  };
+
+  $scope.goToTask = function(taskId){
+    $location.path('/app/tasks/' + taskId);
   };
 })
 
