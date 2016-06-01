@@ -8,14 +8,27 @@
 			<label class="item item-input">
 				<input type="text" placeholder="Título">
 			</label>
+
 			<label class="item item-input">
 				<span class="input-label">Início</span>
 				<input type="date">
 			</label>
 			<label class="item item-input">
+			<span class="input-label">Horário</span>
+				<input type="number" placeholder="H">
+				<input type="number" placeholder="m">
+			</label>
+
+			<label class="item item-input">
 				<span class="input-label">Fim</span>
 				<input type="date">
 			</label>
+			<label class="item item-input">
+			<span class="input-label">Horário</span>
+				<input type="number" placeholder="H">
+				<input type="number" placeholder="m">
+			</label>
+
 			<label class="item item-input">
 				<textarea placeholder="Descrição"></textarea>
 			</label>
@@ -31,9 +44,8 @@
 				</select>
 			</label>
 
-			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">
-			Crie uma nova categoria para suas tarefas
-			</button>
+			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Crie uma nova categoria para minhas tarefas</button>
+			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Remover uma categoria</button>
 		</div>
 
 
