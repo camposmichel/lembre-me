@@ -26,6 +26,10 @@ angular.module('starter.controllers', [])
       alert('err' + JSON.stringify(err));
     });
   };
+
+  $scope.testemichel = function(){
+    alert('OK');
+  };
 })
 
 .controller('TasksDetailController', function($scope, $stateParams, Tasks) {

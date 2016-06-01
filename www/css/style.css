@@ -2,3 +2,11 @@
 .priority-low { color: #FFE978 !important; }
 .priority-medium { color: #FFA700 !important; }
 .priority-high { color: #D62323 !important; }
+
+.footerButtonNewTask {
+	background-color: transparent;
+	background-image: none;
+}
+
+.footerButtonNewTask > div { text-align: right !important; margin: -10px 15px !important;}
+.footerButtonNewTask > div > i { font-size: 40px; color: #056DA9;}
