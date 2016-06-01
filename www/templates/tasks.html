@@ -4,10 +4,11 @@
       <ion-item class="item-remove-animate item-icon-left item-icon-right" ng-repeat="task in tasks | orderBy: '-priority'" type="item-text-wrap">
 
         <i class="icon ion-ios-circle-outline icon-accessory" ng-if="!task.fineshed" ng-click="fineshed(task);" style="font-size: 35px; margin-left: 5px;"></i>
-        <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.fineshed" ng-click="fineshed(task);" style="color:#4FCC41; font-size: 35px; margin-left: 5px;"></i>
+        <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.fineshed" ng-click="fineshed(task);" style="color:#33cd5f; font-size: 35px; margin-left: 5px;"></i>
 
         <div ng-click="goToTask(task.id);" ng-class="{'taskFineshedTextList': task.fineshed}">
           <h2>{{task.title}}</h2>
+          <small>Trabalho</small>
           <p>{{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}</p>
         </div>
 
@@ -26,7 +27,7 @@
   </ion-content>
   <div class="bar bar-footer footerButtonNewTask">
     <div class="title">
-      <i class="icon ion-plus-circled" ng-click="testemichel();"></i>
+      <i class="icon ion-plus-circled" ng-click="modalNewtask.show();"></i>
     </div>
   </div>
 </ion-view>

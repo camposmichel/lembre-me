@@ -3,6 +3,8 @@
 .priority-medium { color: #FFA700 !important; }
 .priority-high { color: #D62323 !important; }
 
+.buttonPriorityMedium { background-color: #FA9805 !important; color: white !important; }
+
 .taskFineshedTextList { text-decoration: line-through; }
 
 .footerButtonNewTask {
@@ -10,5 +12,5 @@
 	background-image: none;
 }
 
-.footerButtonNewTask > div { text-align: right !important; margin: -10px 15px !important;}
+.footerButtonNewTask > div { text-align: right !important; margin: -15px 20px !important;}
 .footerButtonNewTask > div > i { font-size: 40px; color: #056DA9;}
