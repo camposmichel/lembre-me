@@ -3,6 +3,8 @@
 .priority-medium { color: #FFA700 !important; }
 .priority-high { color: #D62323 !important; }
 
+.taskFineshedTextList { text-decoration: line-through; }
+
 .footerButtonNewTask {
 	background-color: transparent;
 	background-image: none;

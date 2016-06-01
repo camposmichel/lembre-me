@@ -3,23 +3,18 @@
     <ion-list>
       <ion-item class="item-remove-animate item-icon-left item-icon-right" ng-repeat="task in tasks | orderBy: '-priority'" type="item-text-wrap">
 
-        <!-- <i class="icon ion-checkmark-circled icon-accessory" ng-if="task.fineshed" style="color:#4FCC41; font-size: 35px; margin-left: 5px;"></i>
-
-        <i class="icon ion-arrow-graph-up-right icon-accessory" ng-if="!task.fineshed" style="font-size: 35px; margin-left: 5px;" ng-class="{'priority-low': task.priority === 1, 'priority-medium': task.priority === 2, 'priority-high': task.priority === 3}"></i> -->
-
         <i class="icon ion-ios-circle-outline icon-accessory" ng-if="!task.fineshed" ng-click="fineshed(task);" style="font-size: 35px; margin-left: 5px;"></i>
         <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.fineshed" ng-click="fineshed(task);" style="color:#4FCC41; font-size: 35px; margin-left: 5px;"></i>
 
-        <div ng-click="goToTask(task.id);">
+        <div ng-click="goToTask(task.id);" ng-class="{'taskFineshedTextList': task.fineshed}">
           <h2>{{task.title}}</h2>
           <p>{{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}</p>
         </div>
 
-        <i class="icon ion-chevron-right icon-accessory"></i>
+        <i class="icon ion-chevron-right ion-ios-arrow-forward" ng-class="{'priority-low': task.priority === 1, 'priority-medium': task.priority === 2, 'priority-high': task.priority === 3}"></i>
 
-        <ion-option-button class="button-balanced" ng-click="fineshed(task);">
-          <i class="icon ion-checkmark-round" ng-if="!task.fineshed"></i>
-          <i class="icon ion-ios-refresh-empty" ng-if="task.fineshed"></i>
+        <ion-option-button class="button-stable" ng-click="changePriority(task);">
+          <i class="icon ion-arrow-graph-up-right"></i>
         </ion-option-button>
         <ion-option-button class="button-assertive" ng-click="remove(task)">
           <i class="icon ion-android-delete"></i>
