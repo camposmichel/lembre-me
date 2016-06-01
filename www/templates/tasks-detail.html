@@ -1,22 +1,24 @@
-<!--
-  This template loads for the 'tab.friend-detail' state (app.js)
-  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
-  The FriendsCtrl pulls data from the Friends service (service.js)
-  The Friends service returns an array of friend data
--->
-<ion-view view-title="{{task.title}} - #{{task.id}}">
+<ion-view view-title="Faltam 2 dias">
+
   <ion-content class="padding">
+    <h2 class="title">{{task.title}}</h2>
     <small>
       {{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}
     </small>
     <br>
-    <img ng-src="../img/ionic.png" style="width: 64px; height: 64px">
+    <img ng-src="./img/ionic.png" style="width: 64px; height: 64px">
     <br>
     <p>
       {{task.details}}
     </p>
 
     <ion-checkbox ng-model="task.fineshed">Feito!</ion-checkbox>
-
   </ion-content>
+
+  <div class="bar bar-footer bar-balanced">
+    <div class="title">
+      <i class="icon ion-checkmark" style="font-size:42px;"></i>
+    </div>
+  </div>
+
 </ion-view>

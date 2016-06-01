@@ -8,6 +8,7 @@
 
         <div ng-click="goToTask(task.id);" ng-class="{'taskFineshedTextList': task.fineshed}">
           <h2>{{task.title}}</h2>
+          <small>Trabalho</small>
           <p>{{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}</p>
         </div>
 
