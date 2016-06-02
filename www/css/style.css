@@ -1,10 +1,7 @@
-/* Empty. Add your own CSS if you like */
 .priority-low { color: #FFE978 !important; }
 .priority-medium { color: #FFA700 !important; }
 .priority-high { color: #D62323 !important; }
-
 .buttonPriorityMedium { background-color: #FA9805 !important; color: white !important; }
-
 .taskFineshedTextList { text-decoration: line-through; }
 
 .footerButtonNewTask {
