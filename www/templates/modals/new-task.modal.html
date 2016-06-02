@@ -3,44 +3,44 @@
 		<button class="button button-icon icon ion-close" ng-click="modalNewtask.hide();"></button>
 		<h1 class="title">Nova tarefa</h1>
 	</ion-header-bar>
-	<ion-content ng-controller="AdminTasksController">
+	<ion-content>
 		<div class="list">
 			<label class="item item-input">
-				<input type="text" placeholder="Título">
+				<input type="text" placeholder="Título" ng-model="newTask.title">
 			</label>
 
 			<label class="item item-input">
 				<span class="input-label">Início</span>
-				<input type="date">
+				<input type="date" ng-model="dateToFormat.startDate">
 			</label>
 			<label class="item item-input">
 			<span class="input-label">Horário</span>
-				<input type="number" placeholder="H">
-				<input type="number" placeholder="m">
+				<input type="number" placeholder="H" ng-model="dateToFormat.startHour">
+				<input type="number" placeholder="m" ng-model="dateToFormat.startMinute">
 			</label>
 
 			<label class="item item-input">
 				<span class="input-label">Fim</span>
-				<input type="date">
+				<input type="date" ng-model="dateToFormat.endDate">
 			</label>
 			<label class="item item-input">
 			<span class="input-label">Horário</span>
-				<input type="number" placeholder="H">
-				<input type="number" placeholder="m">
+				<input type="number" placeholder="H" ng-model="dateToFormat.endHour">
+				<input type="number" placeholder="m" ng-model="dateToFormat.endMinute">
 			</label>
 
 			<label class="item item-input">
-				<textarea placeholder="Descrição"></textarea>
+				<textarea placeholder="Descrição" ng-model="newTask.notes"></textarea>
 			</label>
 
 			<label class="item item-input item-select">
 				<div class="input-label">
 				Categoria
 				</div>
-				<select>
-					<option>Casa</option>
-					<option>Trabalho</option>
-					<option>Faculdade</option>
+				<select ng-model="newTask.location">
+					<option value="Casa">Casa</option>
+					<option value="Trabalho">Trabalho</option>
+					<option value="Faculdade">Faculdade</option>
 				</select>
 			</label>
 
@@ -48,8 +48,7 @@
 			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Remover uma categoria</button>
 		</div>
 
-
-		<div class="bar bar-footer bar-balanced" ng-click="testemichel();">
+		<div class="bar bar-footer bar-balanced" ng-click="saveNewTask();">
 			<div class="title">
 				<i class="icon ion-archive" style="font-size:45px;"></i>
 			</div>
