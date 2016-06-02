@@ -9,16 +9,14 @@
     <img ng-src="./img/ionic.png" style="width: 64px; height: 64px">
     <br>
     <p>
-      {{task.details}}
+      {{task.notes}}
     </p>
-
-    <ion-checkbox ng-model="task.fineshed">Feito!</ion-checkbox>
   </ion-content>
 
-  <div class="bar bar-footer bar-balanced">
+  <div class="bar bar-footer bar-balanced" ng-click="finishTask(task);">
     <div class="title">
-      <i class="icon ion-checkmark" style="font-size:42px;"></i>
+      <i class="icon ion-checkmark" style="font-size:42px;" ng-if="!task.fineshed"></i>
+      <i class="icon ion-android-remove" style="font-size:42px;" ng-if="task.fineshed"></i>
     </div>
   </div>
-
 </ion-view>

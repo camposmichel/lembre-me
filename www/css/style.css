@@ -12,5 +12,5 @@
 	background-image: none;
 }
 
-.footerButtonNewTask > div { text-align: right !important; margin: -15px 20px !important;}
-.footerButtonNewTask > div > i { font-size: 40px; color: #056DA9;}
+.footerButtonNewTask > div { text-align: right !important; margin: -15px 20px !important; height: 56px !important;}
+.footerButtonNewTask > div > i { font-size: 55px; color: #056DA9;}

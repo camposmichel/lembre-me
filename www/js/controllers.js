@@ -17,6 +17,34 @@ angular.module('starter.controllers', [])
   });
 
   $scope.tasks = Tasks.all();
+
+  $scope.reloadTasksList = function(){
+    var today = new Date();
+    $cordovaCalendar.listEventsInRange(
+      today,
+      today.setMonth(today.getMonth() + 1)
+    ).then(function(result) {
+      alert(JSON.stringify(result));
+    }, function(err) {
+      alert('err: ' + JSON.stringify(err));
+    });
+  };
+
+  $scope.testeBolado = function(){
+    var today = new Date();
+    $cordovaCalendar.createEvent({
+      title: 'Primeiro Evento',
+      location: 'Trabalho',
+      notes: 'Espero que funcione',
+      startDate: today,
+      endDate: today.setHours(0, 40, 0)
+    }).then(function(result) {
+      alert(JSON.stringify(result));
+    }, function(err) {
+      alert('err: ' + JSON.stringify(err));
+    });
+  };
+
   $scope.remove = function(chat) {
     Tasks.remove(chat);
   };
@@ -24,14 +52,6 @@ angular.module('starter.controllers', [])
   $scope.fineshed = function(task){
     task.fineshed = !task.fineshed;
     $ionicListDelegate.closeOptionButtons();
-  };
-
-  $scope.listCalendars = function() {
-    $cordovaCalendar.listCalendars().then(function(result) {
-      alert(JSON.stringify(result));
-    }, function(err) {
-      alert('err' + JSON.stringify(err));
-    });
   };
 
   $scope.goToTask = function(taskId){
@@ -65,8 +85,13 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('TasksDetailController', function($scope, $stateParams, Tasks) {
+.controller('TasksDetailController', function($scope, $stateParams, Tasks, $location) {
   $scope.task = Tasks.get($stateParams.chatId);
+
+  $scope.finishTask = function(task){
+    task.fineshed = !task.fineshed;
+    $location.path('/app/tasks');
+  };
 })
 
 .controller('AdminTasksController', function($scope, Tasks, $location, $ionicPopup) {
@@ -80,7 +105,7 @@ angular.module('starter.controllers', [])
     Tasks.add(dataTask);
 
     $scope.newTask.title = '';
-    $scope.newTask.details = '';
+    $scope.newTask.notes = '';
     $scope.setDateToToday();
 
     $location.path('/app/tasks');
@@ -92,9 +117,9 @@ angular.module('starter.controllers', [])
 
   $scope.createCategory = function() {
     $ionicPopup.show({
-      template: '<input type="text" ng-model="teste">',
+      template: '<input type="text" ng-model="teste" placeholder="Ex.: Trabalho">',
       title: 'Nome da nova categoria',
-      subTitle: 'Tente usar apenas uma palavra',
+      subTitle: 'Use poucas palavras',
       scope: $scope,
       buttons: [{
         text: '<i class="icon ion-close"></i>'
