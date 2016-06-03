@@ -33,7 +33,7 @@ angular.module('starter', ['ionic', 'ngCordova','starter.controllers', 'starter.
       }
     })
     .state('app.task-detail', {
-      url: '/tasks/:chatId',
+      url: '/tasks/:taskId',
       views: {
         'tasks': {
           templateUrl: 'templates/tasks-detail.html',

@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('TasksController', function($scope, Tasks, $state, $ionicListDelegate, $cordovaCalendar, $location, $ionicModal, $ionicPopup) {
+.controller('TasksController', function($scope, $rootScope, Tasks, $state, $ionicListDelegate, $cordovaCalendar, $location, $ionicModal, $ionicPopup) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -9,16 +9,30 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  // $scope.tasks = Tasks.all();
   var today = new Date();
-  $cordovaCalendar.findEvent({
-    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 0, 0, 0)
-  }).then(function(result) {
-    // console.log(JSON.stringify(result));
-    $scope.tasks = result;
-  }, function(err) {
-    console.log('LIST - ERROR: ' + JSON.stringify(err));
-  });
+
+  function findTasks(){
+    var oneWeekAgo = new Date(today.setDate(today.getDate() - 7));
+    $cordovaCalendar.findEvent({
+      startDate: new Date(
+        oneWeekAgo.getFullYear(),
+        oneWeekAgo.getMonth(),
+        oneWeekAgo.getDate(),
+        00, 01, 0, 0, 0),
+      endDate: new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        today.getDate(),
+        23, 59, 0, 0, 0)
+    }).then(function(result) {
+      $rootScope.tasks = result;
+    }, function(err) {
+      console.log('LogError - findTasks(): ' + JSON.stringify(err));
+    });
+  }
+
+  // findTasks();
+  $rootScope.tasks = Tasks.all();
 
   $ionicModal.fromTemplateUrl('templates/modals/new-task.modal.html', {
     scope: $scope,
@@ -28,63 +42,38 @@ angular.module('starter.controllers', [])
   });
 
   $scope.reloadList = function(){
+    findTasks();
     $state.go($state.current, {}, {reload: true});
   };
 
-  $scope.removeTask = function(task) {
-    console.log('REMOVE: ' + JSON.stringify(task));
-
-    // var teste1 = new Date(task.startDate);
-    // var teste2 = new Date(task.endDate);
-    // var teste3 = new Date(2016, 5, 2, 12, 40, 25);
-    // var teste4 = new Date(2016, 5, 2, 12, 40, 25);
-
-    // console.log(task.startDate + ' - ' + typeof(task.startDate));
-    // console.log(task.endDate + ' - ' + typeof(task.endDate));
-    // console.log(teste1 + ' - ' + typeof(teste1));
-    // console.log(teste2 + ' - ' + typeof(teste2));
-    // console.log(teste3 + ' - ' + typeof(teste3));
-    // console.log(teste4 + ' - ' + typeof(teste4));
+  $scope.removeTask = function(task, i) {
+    var startDate = new Date(task.startDate),
+        endDate = new Date(task.endDate);
 
     $cordovaCalendar.deleteEvent({
       newTitle: task.title,
       location: task.location,
       notes: task.message,
-      startDate: new Date(2016, 5, 2, 15, 40, 0),
-      endDate: new Date(2016, 5, 2, 16, 40, 0)
+      startDate: new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+        startDate.getHours(),
+        startDate.getMinutes(), 0),
+      endDate: new Date(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate(),
+        endDate.getHours(),
+        endDate.getMinutes(), 0)
     }).then(function(result) {
-      console.log('REMOVE: ' + JSON.stringify(result));
-      $state.reload();
+      if(result){
+        $rootScope.tasks.splice(i, 1);
+      } else {
+        alert('Ops, houve um problema ao remover. Tente novamente.');
+      }
     }, function(err) {
-      console.log('REMOVE - ERROR: ' + JSON.stringify(err));
-    });
-    // alert('em dev...');
-  };
-
-  $scope.testeBolado = function(){
-    // var today = new Date();
-    $cordovaCalendar.createEvent({
-      title: 'UNICO',
-      location: 'UNICO',
-      notes: 'UNICO',
-      startDate: new Date(),
-      endDate: new Date()
-    }).then(function(result) {
-      console.log(JSON.stringify(result));
-      $state.go($state.current, {}, {reload: true});
-    }, function(err) {
-      console.log('err: ' + JSON.stringify(err));
-    });
-  };
-
-  $scope.findTask = function(){
-    // endDate é mandatório
-    $cordovaCalendar.findEvent({
-      endDate: new Date(2016, 5, 3, 11, 0, 0, 0, 0)
-    }).then(function(result) {
-      console.log(JSON.stringify(result));
-    }, function(err) {
-      console.log('err: ' + JSON.stringify(err));
+      console.log('LogError - removeTask(): ' + JSON.stringify(err));
     });
   };
 
@@ -105,22 +94,23 @@ angular.module('starter.controllers', [])
         text: '<i class="icon ion-arrow-graph-up-right"></i>',
         type: 'button-energized',
         onTap: function(e) {
-          console.log(e);
+          task.priority = 1;
         }
       },{
         text: '<i class="icon ion-arrow-graph-up-right"></i>',
         type: 'button-stable buttonPriorityMedium',
         onTap: function(e) {
-          console.log(e);
+          task.priority = 2;
         }
       },{
         text: '<i class="icon ion-arrow-graph-up-right"></i>',
         type: 'button-assertive',
         onTap: function(e) {
-          console.log(e);
+          task.priority = 3;
         }
       }]
     });
+    $ionicListDelegate.closeOptionButtons();
   };
 
   // Modal functions
@@ -135,20 +125,27 @@ angular.module('starter.controllers', [])
   };
 
   $scope.saveNewTask = function(){
-    console.log(JSON.stringify($scope.newTask));
-    console.log(JSON.stringify($scope.dateToFormat));
     $cordovaCalendar.createEvent({
       title: $scope.newTask.title,
       location: $scope.newTask.location,
       notes: $scope.newTask.notes,
-      startDate: new Date(2016, 5, 2, 15, 40, 0),
-      endDate: new Date(2016, 5, 2, 16, 40, 0)
+      startDate: new Date(
+        $scope.dateToFormat.startDate.getFullYear(),
+        $scope.dateToFormat.startDate.getMonth(),
+        $scope.dateToFormat.startDate.getDate(),
+        $scope.dateToFormat.startHour,
+        $scope.dateToFormat.startMinute, 0),
+      endDate: new Date(
+        $scope.dateToFormat.endDate.getFullYear(),
+        $scope.dateToFormat.endDate.getMonth(),
+        $scope.dateToFormat.endDate.getDate(),
+        $scope.dateToFormat.endHour,
+        $scope.dateToFormat.endMinute, 0)
     }).then(function(result) {
-      console.log('SAVE: ' + JSON.stringify(result));
       $scope.modalNewtask.hide();
-      $state.reload();
+      $scope.reloadList();
     }, function(err) {
-      console.log('SAVE - ERROR: ' + JSON.stringify(err));
+      console.log('LogError - saveNewTask(): ' + JSON.stringify(err));
     });
   };
 
@@ -171,13 +168,29 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('TasksDetailController', function($scope, $stateParams, Tasks, $location) {
-  $scope.task = Tasks.get($stateParams.chatId);
+.controller('TasksDetailController', function($scope, $rootScope, $stateParams, Tasks, $location, $ionicPopup) {
+  // $scope.task = Tasks.get($stateParams.taskId, $rootScope.tasks);
+  $scope.task = Tasks.get($stateParams.taskId);
 
   $scope.finishTask = function(task){
     task.fineshed = !task.fineshed;
     $location.path('/app/tasks');
   };
+
+  $scope.confirmRemoveTask = function() {
+    var confirm = $ionicPopup.confirm({
+      title: 'Você realmente gostaria de deletar está tarefa?'
+    });
+
+    confirm.then(function(res) {
+      if (res) {
+        console.log('Sim');
+      } else {
+        console.log('Não');
+      }
+    });
+  };
+
 })
 
 .controller('AdminTasksController', function() {});

@@ -11,3 +11,8 @@
 
 .footerButtonNewTask > div { text-align: right !important; margin: -15px 20px !important; height: 56px !important;}
 .footerButtonNewTask > div > i { font-size: 55px; color: #056DA9;}
+
+.tabsTaskDetails {
+	background-color: #FFFFFF !important;
+  background-image: linear-gradient(0deg, #E4E4E4, #E4E4E4 50%, rgba(0, 0, 0, 0.4) 50%) !important;
+}

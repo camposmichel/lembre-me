@@ -1,19 +1,16 @@
 angular.module('starter.services', [])
 
 .factory('Tasks', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-    var tasks = [{
-        id: 0,
-        title: 'TESTE 1',
-        startDate: new Date(),
-        endDate: new Date(),
-        notes: 'DETALHE PARA UM CARALHOW',
-        fineshed: false,
-        priority: 2,
-        category: 0
-    }];
+  var tasks = [{
+      id: 0,
+      title: 'TESTE 1',
+      startDate: new Date(),
+      endDate: new Date(),
+      notes: 'DETALHE PARA UM CARALHOW',
+      fineshed: false,
+      priority: 2,
+      category: 0
+  }];
 
   return {
     all: function() {
@@ -37,3 +34,10 @@ angular.module('starter.services', [])
     }
   };
 });
+// .service('Tasks', function() {
+//   this.get = function(taskId, tasks){
+//     for (var i = 0; i < tasks.length; i++) {
+//       if(parseInt(tasks[i].id) === parseInt(taskId)) return tasks[i];
+//     }
+//   };
+// });

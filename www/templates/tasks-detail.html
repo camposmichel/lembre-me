@@ -13,10 +13,20 @@
     </p>
   </ion-content>
 
-  <div class="bar bar-footer bar-balanced" ng-click="finishTask(task);">
-    <div class="title">
+  <div class="tabs tabs-icon-only tabsTaskDetails">
+    <a class="button button-positive tab-item">
+      <i class="icon ion-edit"></i>
+    </a>
+    <a class="button button-dark tab-item">
+      <i class="icon ion-ios-browsers"></i>
+    </a>
+    <a class="button button-assertive tab-item" ng-click="confirmRemoveTask();">
+      <i class="icon ion-android-delete"></i>
+    </a>
+    <a class="button button-balanced tab-item" ng-click="finishTask(task);">
       <i class="icon ion-checkmark" style="font-size:42px;" ng-if="!task.fineshed"></i>
       <i class="icon ion-android-remove" style="font-size:42px;" ng-if="task.fineshed"></i>
-    </div>
+    </a>
   </div>
+
 </ion-view>
