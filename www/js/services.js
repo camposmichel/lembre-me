@@ -8,7 +8,7 @@ angular.module('starter.services', [])
 //       endDate: new Date(),
 //       location: 'Unicarioca - Rio Comprido',
 //       notes: 'DETALHE PARA UM CARALHOW',
-//       fineshed: false,
+//       finished: false,
 //       priority: 2,
 //       category: 'Casa'
 //   }];
@@ -19,7 +19,7 @@ angular.module('starter.services', [])
 //     },
 //     add: function(newTask) {
 //       tasks.length > 0 ? newTask.id = parseInt(tasks[tasks.length - 1].id) + 1 : newTask.id = 0;
-//       newTask.fineshed = false;
+//       newTask.finished = false;
 //       tasks.push(newTask);
 //     },
 //     remove: function(chat) {

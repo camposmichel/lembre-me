@@ -1,6 +1,7 @@
-angular.module('starter', ['ionic', 'ngCordova','starter.controllers', 'starter.services'])
+var db = null;
+angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -13,6 +14,12 @@ angular.module('starter', ['ionic', 'ngCordova','starter.controllers', 'starter.
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    db = $cordovaSQLite.openDB({ name: 'lembreMe.db', iosDatabaseLocation: 'default' });
+
+    $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, finished TEXT, priority INTEGER, category TEXT, globalCategory INTEGER DEFAULT -1 )');
+
+    $cordovaSQLite.execute(db,"CREATE TABLE IF NOT EXISTS category (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)");
   });
 })
 

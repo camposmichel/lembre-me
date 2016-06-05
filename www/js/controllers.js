@@ -1,17 +1,59 @@
 angular.module('starter.controllers', [])
 
-.controller('TasksController', function($scope, $rootScope, Tasks, $state, $ionicListDelegate, $cordovaCalendar, $location, $ionicModal, $ionicPopup) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
+.controller('TasksController', function($scope, $rootScope, Tasks, $state, $ionicListDelegate, $cordovaCalendar, $location, $ionicModal, $ionicPopup, $cordovaSQLite) {
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
+  if(!db) console.log('LogError - DATABASE NOT FOUND');
+
   var today = new Date();
+  function saveTasksOnDB(task){
+    $cordovaSQLite.execute(db,
+      'INSERT INTO tasks (id, finished, priority, category) VALUES (?,?,?,?)',
+      [task.id, task.finished, task.priority, task.category])
+    .then(function(result) {}, function(error) {
+      console.error('saveTasksOnDB(): ' + error);
+    });
+  }
+
+  function processList(list){
+    if (list.length) {
+      $cordovaSQLite.execute(db, 'SELECT * FROM tasks').then(function(result) {
+        if (result.rows.length) {
+          for (var x = 0; x < list.length; x++) {
+            for (var y = 0; y < result.rows.length; y++) {
+              if (parseInt(list[x].id) === parseInt(result.rows.item(y).id)) {
+                list[x].priority = result.rows.item(y).priority;
+                list[x].finished = result.rows.item(y).finished === 'true';
+                list[x].category = result.rows.item(y).category;
+                break;
+              } else if (y === result.rows.length-1) {
+                list[x].priority = 1;
+                list[x].finished = false;
+                list[x].category = '';
+                saveTasksOnDB(list[x]);
+              }
+            }
+          }
+        } else {
+          for (var i = 0; i < list.length; i++) {
+            if (!list[i].priority) list[i].priority = 1;
+            if (!list[i].finished) list[i].finished = false;
+            if (!list[i].category) list[i].category = '';
+            saveTasksOnDB(list[i]);
+          }
+        }
+        return list;
+      }, function(err) {
+        console.log('LogError - getSavedTasks(): ' + err);
+      });
+    } else {
+      return [];
+    }
+  }
 
   function findTasks(){
+    console.log('------------------------------------------------ findTasks()');
     var oneWeekAgo = new Date(today.setDate(today.getDate() - 7));
     $cordovaCalendar.findEvent({
       startDate: new Date(
@@ -24,16 +66,60 @@ angular.module('starter.controllers', [])
         today.getMonth() + 1,
         today.getDate(),
         23, 59, 0, 0, 0)
-    }).then(function(result) {
-      $rootScope.tasks = result;
-      // console.log(JSON.stringify($rootScope.tasks));
+    }).then(function(list) {
+      $cordovaSQLite.execute(db, 'SELECT * FROM tasks').then(function(result) {
+        if (result.rows.length) {
+          for (var x = 0; x < list.length; x++) {
+            for (var y = 0; y < result.rows.length; y++) {
+              if (parseInt(list[x].id) === parseInt(result.rows.item(y).id)) {
+                list[x].priority = parseInt(result.rows.item(y).priority);
+                list[x].finished = result.rows.item(y).finished === 'true';
+                list[x].category = result.rows.item(y).category;
+                break;
+              } else if (y === result.rows.length-1) {
+                list[x].priority = 1;
+                list[x].finished = false;
+                list[x].category = '';
+                saveTasksOnDB(list[x]);
+              }
+            }
+          }
+        } else {
+          for (var i = 0; i < list.length; i++) {
+            if (!list[i].priority) list[i].priority = 1;
+            if (!list[i].finished) list[i].finished = false;
+            if (!list[i].category) list[i].category = '';
+            saveTasksOnDB(list[i]);
+          }
+        }
+        // return list;
+        $rootScope.tasks = list;
+      }, function(err) {
+        console.log('LogError - getSavedTasks(): ' + err);
+      });
+      // ---------------
+      // A função processList() deve ser usada para retonar a lista de tarefas atualizada
+      // Porém esta demorando para retornar o valor do banco e por isso rootScope é declarado undefined
+      // Pesquisar sobre callbacks em angular e funções sincronas.
+      // Temporariamente toda a funcionalidade de processList ficara dentro do retorno de findTask()
+      // ---------------
+      // $rootScope.tasks = processList(result);
+      // console.log('rootScope: ' + JSON.stringify($rootScope.tasks));
     }, function(err) {
-      console.log('LogError - findTasks(): ' + JSON.stringify(err));
+      console.log('LogError - findTasks(): ' + err);
     });
   }
 
   findTasks();
   // $rootScope.tasks = Tasks.all();
+  function updateOneFieldTask(id, field, data){
+    $cordovaSQLite.execute(db,
+      'UPDATE tasks SET '+ field +' = ? WHERE id = ?',
+      [data, id])
+    .then(function(result) {}, function(error) {
+      console.error('updateOneFieldTask(): ' + error);
+    });
+  }
 
   $ionicModal.fromTemplateUrl('templates/modals/new-task.modal.html', {
     scope: $scope,
@@ -74,12 +160,13 @@ angular.module('starter.controllers', [])
         alert('Ops, houve um problema ao remover. Tente novamente.');
       }
     }, function(err) {
-      console.log('LogError - removeTask(): ' + JSON.stringify(err));
+      console.log('LogError - removeTask(): ' + err);
     });
   };
 
-  $scope.fineshed = function(task){
-    task.fineshed = !task.fineshed;
+  $scope.finished = function(task){
+    task.finished = !task.finished;
+    updateOneFieldTask(task.id, 'finished', task.finished);
     $ionicListDelegate.closeOptionButtons();
   };
 
@@ -96,18 +183,21 @@ angular.module('starter.controllers', [])
         type: 'button-energized',
         onTap: function(e) {
           task.priority = 1;
+          updateOneFieldTask(task.id, 'priority', 1);
         }
       },{
         text: '<i class="icon ion-arrow-graph-up-right"></i>',
         type: 'button-stable buttonPriorityMedium',
         onTap: function(e) {
           task.priority = 2;
+          updateOneFieldTask(task.id, 'priority', 2);
         }
       },{
         text: '<i class="icon ion-arrow-graph-up-right"></i>',
         type: 'button-assertive',
         onTap: function(e) {
           task.priority = 3;
+          updateOneFieldTask(task.id, 'priority', 3);
         }
       }]
     });
@@ -146,7 +236,7 @@ angular.module('starter.controllers', [])
       $scope.modalNewtask.hide();
       $scope.reloadList();
     }, function(err) {
-      console.log('LogError - saveNewTask(): ' + JSON.stringify(err));
+      console.log('LogError - saveNewTask(): ' + err);
     });
   };
 
@@ -195,7 +285,7 @@ angular.module('starter.controllers', [])
   };
 
   $scope.finishTask = function(task){
-    task.fineshed = !task.fineshed;
+    task.finished = !task.finished;
     $location.path('/app/tasks');
   };
 
