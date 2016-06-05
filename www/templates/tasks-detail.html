@@ -14,19 +14,21 @@
   </ion-content>
 
   <div class="tabs tabs-icon-only tabsTaskDetails">
-    <a class="button button-positive tab-item">
+    <a class="tab-item" ng-click="showModalCopyTask('edit');">
       <i class="icon ion-edit"></i>
     </a>
-    <a class="button button-dark tab-item">
+    <a class="tab-item" ng-click="showModalCopyTask('copy');">
       <i class="icon ion-ios-browsers"></i>
     </a>
-    <a class="button button-assertive tab-item" ng-click="confirmRemoveTask();">
+    <a class="tab-item" ng-click="confirmRemoveTask();">
       <i class="icon ion-android-delete"></i>
-    </a>
-    <a class="button button-balanced tab-item" ng-click="finishTask(task);">
-      <i class="icon ion-checkmark" style="font-size:42px;" ng-if="!task.fineshed"></i>
-      <i class="icon ion-android-remove" style="font-size:42px;" ng-if="task.fineshed"></i>
     </a>
   </div>
 
+  <div class="bar bar-footer bar-balanced" ng-click="finishTask(task);">
+    <div class="title">
+      <i class="icon ion-checkmark" ng-if="!task.fineshed" style="font-size:40px;"></i>
+      <i class="icon ion-android-remove" ng-if="task.fineshed" style="font-size:45px;"></i>
+    </div>
+  </div>
 </ion-view>

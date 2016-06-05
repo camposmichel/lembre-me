@@ -26,13 +26,14 @@ angular.module('starter.controllers', [])
         23, 59, 0, 0, 0)
     }).then(function(result) {
       $rootScope.tasks = result;
+      // console.log(JSON.stringify($rootScope.tasks));
     }, function(err) {
       console.log('LogError - findTasks(): ' + JSON.stringify(err));
     });
   }
 
-  // findTasks();
-  $rootScope.tasks = Tasks.all();
+  findTasks();
+  // $rootScope.tasks = Tasks.all();
 
   $ionicModal.fromTemplateUrl('templates/modals/new-task.modal.html', {
     scope: $scope,
@@ -166,11 +167,32 @@ angular.module('starter.controllers', [])
       }]
     });
   };
+
 })
 
-.controller('TasksDetailController', function($scope, $rootScope, $stateParams, Tasks, $location, $ionicPopup) {
-  // $scope.task = Tasks.get($stateParams.taskId, $rootScope.tasks);
-  $scope.task = Tasks.get($stateParams.taskId);
+.controller('TasksDetailController', function($scope, $rootScope, $stateParams, Tasks, $location, $ionicPopup, $ionicModal) {
+  $scope.task = Tasks.get($stateParams.taskId, $rootScope.tasks);
+  // $scope.task = Tasks.get($stateParams.taskId);
+
+  $ionicModal.fromTemplateUrl('templates/modals/copy-task.modal.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modalCopyTask = modal;
+  });
+
+  $scope.copyTask = angular.copy($scope.task);
+  var startDate = new Date($scope.copyTask.startDate);
+  var endDate = new Date($scope.copyTask.endDate);
+  // console.log(typeof($scope.task.startDate));
+  $scope.dateToFormat = {
+    startDate: startDate,
+    startHour: startDate.getHours(),
+    startMinute: startDate.getMinutes(),
+    endDate: endDate,
+    endHour: endDate.getHours(),
+    endMinute: endDate.getMinutes()
+  };
 
   $scope.finishTask = function(task){
     task.fineshed = !task.fineshed;
@@ -191,6 +213,14 @@ angular.module('starter.controllers', [])
     });
   };
 
+  // Modal functions
+  $scope.showModalCopyTask = function(type) {
+    $scope.actionType = {
+      title: type === 'edit' ? 'Editar Tarefa' : 'Copiar Tarefa',
+      type: type
+    };
+    $scope.modalCopyTask.show();
+  };
 })
 
 .controller('AdminTasksController', function() {});
