@@ -23,8 +23,14 @@
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
+    <script>
+      document.addEventListener('deviceready', function() {
+        angular.bootstrap(document.querySelector('body'), ['starter']);
+      }, false);
+    </script>
   </head>
-  <body ng-app="starter">
+  <!-- <body ng-app="starter"> -->
+  <body>
     <!--
       The nav bar that will be updated as we navigate between views.
     -->
