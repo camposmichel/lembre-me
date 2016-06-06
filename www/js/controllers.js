@@ -241,8 +241,9 @@ angular.module('starter.controllers', [])
   };
 
   $scope.createCategory = function() {
+    $scope.newCategory = {};
     $ionicPopup.show({
-      template: '<input type="text" ng-model="category" placeholder="Ex.: Trabalho" autofocus>',
+      template: '<input type="text" ng-model="newCategory.name" placeholder="Ex.: Trabalho" autofocus>',
       title: 'Nome da nova categoria',
       subTitle: 'Use poucas palavras',
       scope: $scope,
@@ -252,16 +253,17 @@ angular.module('starter.controllers', [])
         text: '<i class="icon ion-checkmark"></i>',
         type: 'button-balanced',
         onTap: function(e) {
-          // console.log(JSON.stringify(e));
-          console.log($scope.category);
-          e.preventDefault();
-          // $cordovaSQLite.execute(db,
-          //   'INSERT INTO category (title) VALUES (?)', [])
-          // .then(function(result) {
-          //   console.log(JSON.stringify(result));
-          // }, function(err) {
-          //   console.log('LogError - createCategory(): ' + err);
-          // });
+          if($scope.newCategory.name){
+            $cordovaSQLite.execute(db,
+              'INSERT INTO category (title) VALUES (?)', [])
+            .then(function(result) {
+              console.log(JSON.stringify(result));
+            }, function(err) {
+              console.log('LogError - createCategory(): ' + err);
+            });
+          } else {
+            e.preventDefault();
+          }
         }
       }]
     });
