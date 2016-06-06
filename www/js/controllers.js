@@ -170,8 +170,8 @@ angular.module('starter.controllers', [])
     $ionicListDelegate.closeOptionButtons();
   };
 
-  $scope.goToTask = function(taskId){
-    $location.path('/app/tasks/' + taskId);
+  $scope.goToTask = function(taskId, index){
+    $location.path('/app/tasks/' + taskId + '/' + index);
   };
 
   $scope.changePriority = function(task){
@@ -242,7 +242,7 @@ angular.module('starter.controllers', [])
 
   $scope.createCategory = function() {
     $ionicPopup.show({
-      template: '<input type="text" ng-model="teste" placeholder="Ex.: Trabalho">',
+      template: '<input type="text" ng-model="category" placeholder="Ex.: Trabalho" autofocus>',
       title: 'Nome da nova categoria',
       subTitle: 'Use poucas palavras',
       scope: $scope,
@@ -252,7 +252,16 @@ angular.module('starter.controllers', [])
         text: '<i class="icon ion-checkmark"></i>',
         type: 'button-balanced',
         onTap: function(e) {
-          console.log(e);
+          // console.log(JSON.stringify(e));
+          console.log($scope.category);
+          e.preventDefault();
+          // $cordovaSQLite.execute(db,
+          //   'INSERT INTO category (title) VALUES (?)', [])
+          // .then(function(result) {
+          //   console.log(JSON.stringify(result));
+          // }, function(err) {
+          //   console.log('LogError - createCategory(): ' + err);
+          // });
         }
       }]
     });
@@ -260,7 +269,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('TasksDetailController', function($scope, $rootScope, $stateParams, Tasks, $location, $ionicPopup, $ionicModal) {
+.controller('TasksDetailController', function($scope, $rootScope, $stateParams, Tasks, $location, $ionicPopup, $ionicModal, $cordovaCalendar, $cordovaSQLite) {
   $scope.task = Tasks.get($stateParams.taskId, $rootScope.tasks);
   // $scope.task = Tasks.get($stateParams.taskId);
 
@@ -274,7 +283,7 @@ angular.module('starter.controllers', [])
   $scope.copyTask = angular.copy($scope.task);
   var startDate = new Date($scope.copyTask.startDate);
   var endDate = new Date($scope.copyTask.endDate);
-  // console.log(typeof($scope.task.startDate));
+
   $scope.dateToFormat = {
     startDate: startDate,
     startHour: startDate.getHours(),
@@ -284,21 +293,60 @@ angular.module('starter.controllers', [])
     endMinute: endDate.getMinutes()
   };
 
+  function updateOneFieldTask(id, field, data){
+    $cordovaSQLite.execute(db,
+      'UPDATE tasks SET '+ field +' = ? WHERE id = ?',
+      [data, id])
+    .then(function(result) {}, function(error) {
+      console.error('updateOneFieldTask(): ' + error);
+    });
+  }
+
   $scope.finishTask = function(task){
     task.finished = !task.finished;
+    updateOneFieldTask(task.id, 'finished', task.finished);
     $location.path('/app/tasks');
   };
 
   $scope.confirmRemoveTask = function() {
     var confirm = $ionicPopup.confirm({
-      title: 'Você realmente gostaria de deletar está tarefa?'
+      title: 'Você realmente gostaria de deletar está tarefa?',
+      cancelText: '<i class="icon ion-close"></i>',
+      okText: '<i class="icon ion-android-delete"></i>',
+      okType: 'button-assertive'
     });
 
     confirm.then(function(res) {
       if (res) {
-        console.log('Sim');
-      } else {
-        console.log('Não');
+        var dataInicio = new Date($scope.task.startDate),
+            dataFim = new Date($scope.task.endDate);
+
+        $cordovaCalendar.deleteEvent({
+          newTitle: $scope.task.title,
+          location: $scope.task.location,
+          notes: $scope.task.message,
+          startDate: new Date(
+            dataInicio.getFullYear(),
+            dataInicio.getMonth(),
+            dataInicio.getDate(),
+            dataInicio.getHours(),
+            dataInicio.getMinutes(), 0),
+          endDate: new Date(
+            dataFim.getFullYear(),
+            dataFim.getMonth(),
+            dataFim.getDate(),
+            dataFim.getHours(),
+            dataFim.getMinutes(), 0)
+        }).then(function(result) {
+          if (result) {
+            $rootScope.tasks.splice($stateParams.indexList, 1);
+            $location.path('/app/tasks');
+          } else {
+            alert('Ops, houve um problema ao deletar está tarefa. Tente novamente.');
+          }
+        }, function(err) {
+          console.log('LogError - confirmRemoveTask(): ' + err);
+        });
       }
     });
   };

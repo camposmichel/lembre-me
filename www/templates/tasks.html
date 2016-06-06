@@ -9,7 +9,7 @@
         <i class="icon ion-ios-circle-outline icon-accessory" ng-if="!task.finished" ng-click="finished(task);" style="font-size: 35px; margin-left: 5px;"></i>
         <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.finished" ng-click="finished(task);" style="color:#33cd5f; font-size: 35px; margin-left: 5px;"></i>
 
-        <div ng-click="goToTask(task.id);" ng-class="{'taskFineshedTextList': task.finished}">
+        <div ng-click="goToTask(task.id, $index);" ng-class="{'taskFineshedTextList': task.finished}">
           <h2>{{task.title}}</h2>
           <small>{{task.location}}</small>
           <p>{{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}</p>
