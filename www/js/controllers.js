@@ -11,7 +11,9 @@ angular.module('starter.controllers', [])
     $cordovaSQLite.execute(db,
       'INSERT INTO tasks (id, finished, priority, category) VALUES (?,?,?,?)',
       [task.id, task.finished, task.priority, task.category])
-    .then(function(result) {}, function(error) {
+    .then(function(result) {
+      console.log('saveTasksOnDB: ' + JSON.stringify(result));
+    }, function(error) {
       console.error('saveTasksOnDB(): ' + error);
     });
   }
@@ -215,6 +217,24 @@ angular.module('starter.controllers', [])
     endMinute: 00
   };
 
+  $scope.openModalNewTask = function() {
+    $cordovaSQLite.execute(db, 'SELECT * FROM category').then(function(result) {
+      var arr = [];
+      if (result.rows.length) {
+        for (var a = 0; a < result.rows.length; a++) {
+          arr.push({
+            id: result.rows.item(a).id,
+            title: result.rows.item(a).title
+          });
+        }
+      }
+      $scope.categoryList = arr;
+      $scope.modalNewtask.show();
+    }, function(err) {
+      console.log('LogError - getCategoryList(): ' + err);
+    });
+  };
+
   $scope.saveNewTask = function(){
     $cordovaCalendar.createEvent({
       title: $scope.newTask.title,
@@ -233,12 +253,31 @@ angular.module('starter.controllers', [])
         $scope.dateToFormat.endHour,
         $scope.dateToFormat.endMinute, 0)
     }).then(function(result) {
+      console.log('LogSave - saveNewTask(): ' + JSON.stringify(result));
       $scope.modalNewtask.hide();
       $scope.reloadList();
     }, function(err) {
       console.log('LogError - saveNewTask(): ' + err);
     });
   };
+
+  function getCategoryList(){
+    $cordovaSQLite.execute(db, 'SELECT * FROM category').then(function(result) {
+      var arr = [];
+      if (result.rows.length) {
+        for (var a = 0; a < result.rows.length; a++) {
+          arr.push({
+            id: result.rows.item(a).id,
+            title: result.rows.item(a).title
+          });
+        }
+      }
+      console.log('retornando...');
+      return arr;
+    }, function(err) {
+      console.log('LogError - getCategoryList(): ' + err);
+    });
+  }
 
   $scope.createCategory = function() {
     $scope.newCategory = {};
@@ -255,9 +294,14 @@ angular.module('starter.controllers', [])
         onTap: function(e) {
           if($scope.newCategory.name){
             $cordovaSQLite.execute(db,
-              'INSERT INTO category (title) VALUES (?)', [])
+              'INSERT INTO category (title) VALUES (?)', [$scope.newCategory.name])
             .then(function(result) {
-              console.log(JSON.stringify(result));
+              if(parseInt(result.rowsAffected) === 1){
+                $scope.categoryList.push({
+                  id: result.insertId,
+                  title: $scope.newCategory.name
+                });
+              }
             }, function(err) {
               console.log('LogError - createCategory(): ' + err);
             });

@@ -37,15 +37,15 @@
 				<div class="input-label">
 				Categoria
 				</div>
-				<select ng-init="newTask.location = 'Casa'" ng-model="newTask.location">
-					<option value="Casa">Casa</option>
-					<option value="Trabalho">Trabalho</option>
-					<option value="Faculdade">Faculdade</option>
+				<select ng-init="newTask.category = '-1'" ng-model="newTask.category">
+					<option value="-1">--Selecionar--</option>
+					<option ng-repeat="cat in categoryList | orderBy: 'title'" value="{{cat.id}}">
+						{{cat.title}}
+					</option>
 				</select>
 			</label>
 
 			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Criar uma nova categoria para minhas tarefas</button>
-			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Remover uma categoria</button>
 		</div>
 
 		<div class="bar bar-footer bar-balanced" ng-click="saveNewTask();">
