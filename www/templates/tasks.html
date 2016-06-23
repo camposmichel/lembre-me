@@ -2,14 +2,19 @@
   <ion-nav-buttons side="primary">
     <button class="button button-icon icon ion-ios-loop-strong" ng-click="reloadList();"></button>
   </ion-nav-buttons>
+  <div class="bar bar-subheader">
+    <button class="button button-stable icon-left ion-arrow-down-b" style="width: 100%;" ng-click="listCategory();">
+      <h3 style="color: #056DA9;">{{categorySelected}}</h3>
+    </button>
+  </div>
   <ion-content>
     <ion-list>
       <ion-item class="item-remove-animate item-icon-left item-icon-right" ng-repeat="task in tasks | orderBy: ['-priority', 'endDate']" type="item-text-wrap">
 
-        <i class="icon ion-ios-circle-outline icon-accessory" ng-if="!task.fineshed" ng-click="fineshed(task);" style="font-size: 35px; margin-left: 5px;"></i>
-        <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.fineshed" ng-click="fineshed(task);" style="color:#33cd5f; font-size: 35px; margin-left: 5px;"></i>
+        <i class="icon ion-ios-circle-outline icon-accessory" ng-if="!task.finished" ng-click="finished(task);" style="font-size: 35px; margin-left: 5px;"></i>
+        <i class="icon ion-ios-checkmark icon-accessory" ng-if="task.finished" ng-click="finished(task);" style="color:#33cd5f; font-size: 35px; margin-left: 5px;"></i>
 
-        <div ng-click="goToTask(task.id);" ng-class="{'taskFineshedTextList': task.fineshed}">
+        <div ng-click="goToTask(task.id, $index);" ng-class="{'taskFineshedTextList': task.finished}">
           <h2>{{task.title}}</h2>
           <small>{{task.location}}</small>
           <p>{{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}</p>
@@ -17,7 +22,7 @@
 
         <i class="icon ion-chevron-right ion-ios-arrow-forward" ng-class="{'priority-low': task.priority === 1, 'priority-medium': task.priority === 2, 'priority-high': task.priority === 3}"></i>
 
-        <ion-option-button class="button-stable" ng-click="changePriority(task);">
+        <ion-option-button class="button-stable" ng-if="!task.finished" ng-click="changePriority(task);">
           <i class="icon ion-arrow-graph-up-right"></i>
         </ion-option-button>
         <ion-option-button class="button-assertive" ng-click="removeTask(task, $index)">
@@ -25,12 +30,14 @@
         </ion-option-button>
 
       </ion-item>
+      <!-- <ion-item><button class="button" ng-click="logTasksToDebug()">LIST</button></ion-item> -->
       <ion-item></ion-item>
     </ion-list>
   </ion-content>
+
   <div class="bar bar-footer footerButtonNewTask">
     <div class="title">
-      <i class="icon ion-ios-compose" ng-click="modalNewtask.show();"></i>
+      <i class="icon ion-ios-compose" ng-click="openModalNewTask();"></i>
     </div>
   </div>
 </ion-view>

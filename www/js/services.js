@@ -3,13 +3,45 @@ angular.module('starter.services', [])
 // .factory('Tasks', function() {
 //   var tasks = [{
 //       id: 0,
-//       title: 'TESTE 1',
+//       title: 'Prova de Desenvolvimento Web',
 //       startDate: new Date(),
 //       endDate: new Date(),
 //       location: 'Unicarioca - Rio Comprido',
 //       notes: 'DETALHE PARA UM CARALHOW',
-//       fineshed: false,
+//       finished: false,
 //       priority: 2,
+//       category: 'Casa'
+//   },
+//   {
+//       id: 1,
+//       title: 'Comprar pão quando voltar para casa',
+//       startDate: new Date(),
+//       endDate: new Date(),
+//       location: 'Ilha do Governador',
+//       notes: 'DETALHE PARA UM CARALHOW',
+//       finished: false,
+//       priority: 1,
+//       category: 'Casa'
+//   },
+//   {
+//       id: 2,
+//       title: 'Ligar para o banco',
+//       startDate: new Date(),
+//       endDate: new Date(),
+//       notes: 'DETALHE PARA UM CARALHOW',
+//       finished: false,
+//       priority: 3,
+//       category: 'Casa'
+//   },
+//   {
+//       id: 3,
+//       title: 'Terminar o projeto',
+//       startDate: new Date(),
+//       endDate: new Date(),
+//       location: 'Av. Rio Branco - Centro',
+//       notes: 'DETALHE PARA UM CARALHOW',
+//       finished: false,
+//       priority: 3,
 //       category: 'Casa'
 //   }];
 
@@ -19,7 +51,7 @@ angular.module('starter.services', [])
 //     },
 //     add: function(newTask) {
 //       tasks.length > 0 ? newTask.id = parseInt(tasks[tasks.length - 1].id) + 1 : newTask.id = 0;
-//       newTask.fineshed = false;
+//       newTask.finished = false;
 //       tasks.push(newTask);
 //     },
 //     remove: function(chat) {
