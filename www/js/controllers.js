@@ -6,7 +6,8 @@ angular.module('starter.controllers', [])
 
   if(!db) console.log('LogError - DATABASE NOT FOUND');
 
-  var today = new Date();
+  $scope.categorySelected = 'Todas';
+
   function saveTasksOnDB(task){
     $cordovaSQLite.execute(db,
       'INSERT INTO tasks (id, finished, priority, category) VALUES (?,?,?,?)',
@@ -14,7 +15,7 @@ angular.module('starter.controllers', [])
     .then(function(result) {
       console.log('saveTasksOnDB: ' + JSON.stringify(result));
     }, function(error) {
-      console.error('saveTasksOnDB(): ' + error);
+      console.error('LogError - saveTasksOnDB(): ' + error);
     });
   }
 
@@ -54,8 +55,9 @@ angular.module('starter.controllers', [])
     }
   }
 
-  function findTasks(){
+  function findTasks(categoryId){
     console.log('------------------------------------------------ findTasks()');
+    var today = new Date();
     var oneWeekAgo = new Date(today.setDate(today.getDate() - 7));
     $cordovaCalendar.findEvent({
       startDate: new Date(
@@ -73,6 +75,7 @@ angular.module('starter.controllers', [])
         if (result.rows.length) {
           for (var x = 0; x < list.length; x++) {
             for (var y = 0; y < result.rows.length; y++) {
+              // console.log(list[x].id + ' - ' + result.rows.item(y).id);
               if (parseInt(list[x].id) === parseInt(result.rows.item(y).id)) {
                 list[x].priority = parseInt(result.rows.item(y).priority);
                 list[x].finished = result.rows.item(y).finished === 'true';
@@ -81,7 +84,7 @@ angular.module('starter.controllers', [])
               } else if (y === result.rows.length-1) {
                 list[x].priority = 1;
                 list[x].finished = false;
-                list[x].category = '';
+                list[x].category = categoryId;
                 saveTasksOnDB(list[x]);
               }
             }
@@ -94,10 +97,12 @@ angular.module('starter.controllers', [])
             saveTasksOnDB(list[i]);
           }
         }
-        // return list;
+
         $rootScope.tasks = list;
+        if($rootScope.copyTasks) $rootScope.copyTasks = list;
+        // console.log(JSON.stringify($rootScope.tasks));
       }, function(err) {
-        console.log('LogError - getSavedTasks(): ' + err);
+        console.log('LogError - findTasks() 1: ' + err);
       });
       // ---------------
       // A função processList() deve ser usada para retonar a lista de tarefas atualizada
@@ -108,12 +113,15 @@ angular.module('starter.controllers', [])
       // $rootScope.tasks = processList(result);
       // console.log('rootScope: ' + JSON.stringify($rootScope.tasks));
     }, function(err) {
-      console.log('LogError - findTasks(): ' + err);
+      console.log('LogError - findTasks() 2: ' + err);
     });
   }
 
+// ================================================================================================================
   findTasks();
   // $rootScope.tasks = Tasks.all();
+// ================================================================================================================
+
   function updateOneFieldTask(id, field, data){
     $cordovaSQLite.execute(db,
       'UPDATE tasks SET '+ field +' = ? WHERE id = ?',
@@ -157,7 +165,7 @@ angular.module('starter.controllers', [])
         endDate.getMinutes(), 0)
     }).then(function(result) {
       if(result){
-        $rootScope.tasks.splice(i, 1);
+        $scope.reloadList();
       } else {
         alert('Ops, houve um problema ao remover. Tente novamente.');
       }
@@ -231,7 +239,7 @@ angular.module('starter.controllers', [])
       $scope.categoryList = arr;
       $scope.modalNewtask.show();
     }, function(err) {
-      console.log('LogError - getCategoryList(): ' + err);
+      console.log('LogError - openModalNewTask(): ' + err);
     });
   };
 
@@ -253,9 +261,11 @@ angular.module('starter.controllers', [])
         $scope.dateToFormat.endHour,
         $scope.dateToFormat.endMinute, 0)
     }).then(function(result) {
-      console.log('LogSave - saveNewTask(): ' + JSON.stringify(result));
+      // INSERIR REFERENCIA NO BANCO ==============================================
       $scope.modalNewtask.hide();
-      $scope.reloadList();
+      findTasks($scope.newTask.category);
+      $state.go($state.current, {}, {reload: true});
+      // ==========================================================================
     }, function(err) {
       console.log('LogError - saveNewTask(): ' + err);
     });
@@ -278,6 +288,39 @@ angular.module('starter.controllers', [])
       console.log('LogError - getCategoryList(): ' + err);
     });
   }
+
+  function showPopupSelectCategory(){
+    $scope.popupSelectCategory = $ionicPopup.show({
+      templateUrl: 'templates/popups/select-category.popup.html',
+      title: 'Selecione uma categoria',
+      scope: $scope,
+      buttons: [{
+        text: '<i class="icon ion-plus"></i>',
+        type: 'button-stable',
+        onTap: function(e) {
+          $scope.createCategory();
+        }
+      }]
+    });
+  }
+
+  $scope.listCategory = function(){
+    $cordovaSQLite.execute(db, 'SELECT * FROM category').then(function(result) {
+      var arr = [];
+      if (result.rows.length) {
+        for (var a = 0; a < result.rows.length; a++) {
+          arr.push({
+            id: result.rows.item(a).id,
+            title: result.rows.item(a).title
+          });
+        }
+      }
+      $scope.categoryList = arr;
+      showPopupSelectCategory();
+    }, function(err) {
+      console.log('LogError - listCategory(): ' + err);
+    });
+  };
 
   $scope.createCategory = function() {
     $scope.newCategory = {};
@@ -311,6 +354,66 @@ angular.module('starter.controllers', [])
         }
       }]
     });
+  };
+
+  $scope.confirmEditCategory = function(category){
+    category.editNow = false;
+    $cordovaSQLite.execute(db,
+      'UPDATE category SET title = ? WHERE id = ?',
+      [category.title, category.id])
+    .then(function(result) {}, function(error) {
+      console.error('LogError - confirmEditCategory(): ' + error);
+    });
+  }
+
+  $scope.deleteCategory = function(category, i){
+    category.deleteNow = false;
+    $scope.categoryList.splice(i, 1);
+    $cordovaSQLite.execute(db,
+      'DELETE FROM category WHERE id = ?',
+      [category.id])
+    .then(function(result) {}, function(error) {
+      console.error('LogError - deleteCategory(): ' + error);
+    });
+  };
+
+  $scope.listAllTasksToCategory = function(category){
+    if($rootScope.copyTasks) $rootScope.tasks = angular.copy($rootScope.copyTasks);
+    else $rootScope.copyTasks = angular.copy($rootScope.tasks);
+
+    if (category === null) {
+      $scope.categorySelected = 'Todas';
+      findTasks();
+    } else {
+      $scope.categorySelected = category.title;
+      var arr = [];
+      for (var a = 0; a < $rootScope.tasks.length; a++) {
+        if(parseInt($rootScope.tasks[a].category) === parseInt(category.id)) {
+          arr.push($rootScope.tasks[a]);
+        }
+      }
+
+      $rootScope.tasks = arr;
+    }
+
+    $scope.popupSelectCategory.close();
+  };
+
+  // FUNCTIONS DEBUG
+  $scope.logTasksToDebug = function(){
+    $cordovaSQLite.execute(db, 'SELECT * FROM tasks').then(function(result) {
+        if (result.rows.length) {
+          for (var y = 0; y < result.rows.length; y++) {
+            console.log(result.rows.item(y).id + ' - ' +
+              result.rows.item(y).finished + ' - ' +
+              result.rows.item(y).priority + ' - ' +
+              result.rows.item(y).category + ' - ' +
+              result.rows.item(y).globalCategory);
+          }
+        }
+      }, function(err) {
+        console.log('LogError - logTasksToDebug(): ' + err);
+      });
   };
 
 })

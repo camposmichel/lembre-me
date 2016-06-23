@@ -39,7 +39,7 @@
 				</div>
 				<select ng-init="newTask.category = '-1'" ng-model="newTask.category">
 					<option value="-1">--Selecionar--</option>
-					<option ng-repeat="cat in categoryList | orderBy: 'title'" value="{{cat.id}}">
+					<option ng-repeat="cat in categoryList" value="{{cat.id}}">
 						{{cat.title}}
 					</option>
 				</select>

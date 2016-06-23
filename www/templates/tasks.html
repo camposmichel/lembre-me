@@ -2,6 +2,11 @@
   <ion-nav-buttons side="primary">
     <button class="button button-icon icon ion-ios-loop-strong" ng-click="reloadList();"></button>
   </ion-nav-buttons>
+  <div class="bar bar-subheader">
+    <button class="button button-stable icon-left ion-arrow-down-b" style="width: 100%;" ng-click="listCategory();">
+      <h3 style="color: #056DA9;">{{categorySelected}}</h3>
+    </button>
+  </div>
   <ion-content>
     <ion-list>
       <ion-item class="item-remove-animate item-icon-left item-icon-right" ng-repeat="task in tasks | orderBy: ['-priority', 'endDate']" type="item-text-wrap">
@@ -25,9 +30,11 @@
         </ion-option-button>
 
       </ion-item>
+      <!-- <ion-item><button class="button" ng-click="logTasksToDebug()">LIST</button></ion-item> -->
       <ion-item></ion-item>
     </ion-list>
   </ion-content>
+
   <div class="bar bar-footer footerButtonNewTask">
     <div class="title">
       <i class="icon ion-ios-compose" ng-click="openModalNewTask();"></i>

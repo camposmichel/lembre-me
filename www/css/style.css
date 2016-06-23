@@ -16,3 +16,7 @@
 	color: #111;
   height: 95px;
 }
+
+.has-header {
+    top: 88px !important;
+}

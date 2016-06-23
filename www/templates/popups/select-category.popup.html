@@ -1,0 +1,34 @@
+<ul class="list">
+    <span ng-if="!categoryList.length">
+      Você ainda não tem nenhuma categoria. Que tal criar uma nova categoria para suas tarefas?
+    </span>
+    <li class="item" ng-if="categoryList.length" ng-click="listAllTasksToCategory(null);">Todas</li>
+
+    <li class="item item-icon-right"
+    ng-repeat="category in categoryList"
+    ng-class="{'item-input-inset': category.editNow}">
+      <span ng-click="listAllTasksToCategory(category);" ng-if="!category.editNow">
+        {{category.title}}
+        <br ng-if="!category.editNow && category.deleteNow">
+        <small style="color:red; font-size:12px;" ng-if="!category.editNow && category.deleteNow">
+          Realmente quer deletar?
+        </small>
+      </span>
+
+      <i class="icon ion-android-delete"
+      ng-if="!category.editNow && !category.deleteNow"
+      ng-click="category.deleteNow = true;">
+      </i>
+      <i class="icon ion-android-delete" style="color:red;"
+      ng-if="!category.editNow && category.deleteNow"
+      ng-click="deleteCategory(category, $index);">
+      </i>
+
+      <i class="icon ion-ios-compose-outline" style="margin-right: 32px;" ng-click="category.editNow = true;" ng-if="!category.editNow"></i>
+
+      <label class="item-input-wrapper" ng-if="category.editNow">
+        <input type="text" value="{{category.title}}" ng-model="category.title">
+      </label>
+      <button class="button button-small" ng-if="category.editNow" ng-click="confirmEditCategory(category);">Ok</button>
+    </li>
+</ul>
