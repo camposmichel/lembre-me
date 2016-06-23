@@ -442,6 +442,12 @@ angular.module('starter.controllers', [])
     endMinute: endDate.getMinutes()
   };
 
+  $scope.getDiffDays = function(){
+    var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return diffDays;
+  };
+
   function updateOneFieldTask(id, field, data){
     $cordovaSQLite.execute(db,
       'UPDATE tasks SET '+ field +' = ? WHERE id = ?',
@@ -451,10 +457,103 @@ angular.module('starter.controllers', [])
     });
   }
 
+  function saveTasksOnDB(task){
+    $cordovaSQLite.execute(db,
+      'INSERT INTO tasks (id, finished, priority, category) VALUES (?,?,?,?)',
+      [task.id, task.finished, task.priority, task.category])
+    .then(function(result) {
+      console.log('saveTasksOnDB: ' + JSON.stringify(result));
+    }, function(error) {
+      console.error('LogError - saveTasksOnDB(): ' + error);
+    });
+  }
+
   $scope.finishTask = function(task){
     task.finished = !task.finished;
     updateOneFieldTask(task.id, 'finished', task.finished);
     $location.path('/app/tasks');
+  };
+
+  function findTasks(categoryId){
+    console.log('------------------------------------------------ findTasks() COPY');
+    var today = new Date();
+    var oneWeekAgo = new Date(today.setDate(today.getDate() - 7));
+    $cordovaCalendar.findEvent({
+      startDate: new Date(
+        oneWeekAgo.getFullYear(),
+        oneWeekAgo.getMonth(),
+        oneWeekAgo.getDate(),
+        00, 01, 0, 0, 0),
+      endDate: new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        today.getDate(),
+        23, 59, 0, 0, 0)
+    }).then(function(list) {
+      $cordovaSQLite.execute(db, 'SELECT * FROM tasks').then(function(result) {
+        if (result.rows.length) {
+          for (var x = 0; x < list.length; x++) {
+            for (var y = 0; y < result.rows.length; y++) {
+              // console.log(list[x].id + ' - ' + result.rows.item(y).id);
+              if (parseInt(list[x].id) === parseInt(result.rows.item(y).id)) {
+                list[x].priority = parseInt(result.rows.item(y).priority);
+                list[x].finished = result.rows.item(y).finished === 'true';
+                list[x].category = result.rows.item(y).category;
+                break;
+              } else if (y === result.rows.length-1) {
+                list[x].priority = 1;
+                list[x].finished = false;
+                list[x].category = categoryId;
+                saveTasksOnDB(list[x]);
+              }
+            }
+          }
+        } else {
+          for (var i = 0; i < list.length; i++) {
+            if (!list[i].priority) list[i].priority = 1;
+            if (!list[i].finished) list[i].finished = false;
+            if (!list[i].category) list[i].category = '';
+            saveTasksOnDB(list[i]);
+          }
+        }
+
+        $rootScope.tasks = list;
+        if($rootScope.copyTasks) $rootScope.copyTasks = list;
+        // console.log(JSON.stringify($rootScope.tasks));
+      }, function(err) {
+        console.log('LogError - findTasks() 1: ' + err);
+      });
+    }, function(err) {
+      console.log('LogError - findTasks() 2: ' + err);
+    });
+  }
+
+  $scope.saveNewTask = function(){
+    $cordovaCalendar.createEvent({
+      title: $scope.copyTask.title,
+      location: $scope.copyTask.location,
+      notes: $scope.copyTask.notes,
+      startDate: new Date(
+        $scope.dateToFormat.startDate.getFullYear(),
+        $scope.dateToFormat.startDate.getMonth(),
+        $scope.dateToFormat.startDate.getDate(),
+        $scope.dateToFormat.startHour,
+        $scope.dateToFormat.startMinute, 0),
+      endDate: new Date(
+        $scope.dateToFormat.endDate.getFullYear(),
+        $scope.dateToFormat.endDate.getMonth(),
+        $scope.dateToFormat.endDate.getDate(),
+        $scope.dateToFormat.endHour,
+        $scope.dateToFormat.endMinute, 0)
+    }).then(function(result) {
+      // INSERIR REFERENCIA NO BANCO ==============================================
+      findTasks($scope.copyTask.category);
+      $scope.modalCopyTask.hide();
+      // $state.go($state.current, {}, {reload: true});
+      // ==========================================================================
+    }, function(err) {
+      console.log('LogError - saveNewTask(): ' + err);
+    });
   };
 
   $scope.confirmRemoveTask = function() {
@@ -502,11 +601,117 @@ angular.module('starter.controllers', [])
 
   // Modal functions
   $scope.showModalCopyTask = function(type) {
+    if(type === 'edit') $scope.copyTaskToEdit = angular.copy($scope.copyTask);
+
     $scope.actionType = {
       title: type === 'edit' ? 'Editar Tarefa' : 'Copiar Tarefa',
       type: type
     };
-    $scope.modalCopyTask.show();
+    if(!$scope.categoryList) {
+      $cordovaSQLite.execute(db, 'SELECT * FROM category').then(function(result) {
+        var arr = [];
+        if (result.rows.length) {
+          for (var a = 0; a < result.rows.length; a++) {
+            arr.push({
+              id: result.rows.item(a).id,
+              title: result.rows.item(a).title
+            });
+          }
+        }
+        $scope.categoryList = arr;
+        $scope.modalCopyTask.show();
+      }, function(err) {
+        console.log('LogError - listCategory(): ' + err);
+      });
+    } else {
+      $scope.modalCopyTask.show();
+    }
+  };
+
+  $scope.createCategory = function() {
+    $scope.newCategory = {};
+    $ionicPopup.show({
+      template: '<input type="text" ng-model="newCategory.name" placeholder="Ex.: Trabalho" autofocus>',
+      title: 'Nome da nova categoria',
+      subTitle: 'Use poucas palavras',
+      scope: $scope,
+      buttons: [{
+        text: '<i class="icon ion-close"></i>'
+      }, {
+        text: '<i class="icon ion-checkmark"></i>',
+        type: 'button-balanced',
+        onTap: function(e) {
+          if($scope.newCategory.name){
+            $cordovaSQLite.execute(db,
+              'INSERT INTO category (title) VALUES (?)', [$scope.newCategory.name])
+            .then(function(result) {
+              if(parseInt(result.rowsAffected) === 1){
+                $scope.categoryList.push({
+                  id: result.insertId,
+                  title: $scope.newCategory.name
+                });
+              }
+            }, function(err) {
+              console.log('LogError - createCategory(): ' + err);
+            });
+          } else {
+            e.preventDefault();
+          }
+        }
+      }]
+    });
+  };
+
+  $scope.editTask = function(){
+    console.log('editTask');
+    var startDate = new Date($scope.copyTaskToEdit.startDate);
+    var endDate = new Date($scope.copyTaskToEdit.endDate);
+    console.log('editTask 1');
+    var dataToEdit = {
+      startDate: startDate,
+      startHour: startDate.getHours(),
+      startMinute: startDate.getMinutes(),
+      endDate: endDate,
+      endHour: endDate.getHours(),
+      endMinute: endDate.getMinutes()
+    };
+    console.log('editTask 2');
+    $cordovaCalendar.modifyEvent({
+      title: $scope.copyTaskToEdit.title,
+      location: $scope.copyTaskToEdit.location,
+      notes: $scope.copyTaskToEdit.notes,
+      startDate: new Date(
+        dataToEdit.startDate.getFullYear(),
+        dataToEdit.startDate.getMonth(),
+        dataToEdit.startDate.getDate(),
+        dataToEdit.startHour,
+        dataToEdit.startMinute, 0),
+      endDate: new Date(
+        dataToEdit.endDate.getFullYear(),
+        dataToEdit.endDate.getMonth(),
+        dataToEdit.endDate.getDate(),
+        dataToEdit.endHour,
+        dataToEdit.endMinute, 0),
+      newTitle: $scope.copyTask.title,
+      newLocation: $scope.copyTask.location,
+      newNotes: $scope.copyTask.notes,
+      newStartDate: new Date(
+        $scope.dateToFormat.startDate.getFullYear(),
+        $scope.dateToFormat.startDate.getMonth(),
+        $scope.dateToFormat.startDate.getDate(),
+        $scope.dateToFormat.startHour,
+        $scope.dateToFormat.startMinute, 0),
+      newEndDate: new Date(
+        $scope.dateToFormat.endDate.getFullYear(),
+        $scope.dateToFormat.endDate.getMonth(),
+        $scope.dateToFormat.endDate.getDate(),
+        $scope.dateToFormat.endHour,
+        $scope.dateToFormat.endMinute, 0)
+    }).then(function(result) {
+      console.log('FUNCIONOOOU!' + JSON.stringify(result));
+    }, function(err) {
+      console.log('err!' + JSON.stringify(err));
+    });
   };
 })
 

@@ -38,14 +38,13 @@
 				Categoria
 				</div>
 				<select ng-model="copyTask.category">
-					<option value="Casa">Casa</option>
-					<option value="Trabalho">Trabalho</option>
-					<option value="Faculdade">Faculdade</option>
+					<option ng-repeat="cat in categoryList" value="{{cat.id}}">
+						{{cat.title}}
+					</option>
 				</select>
 			</label>
 
 			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Criar uma nova categoria para minhas tarefas</button>
-			<button class="button button-clear button-positive" style="width:100%;" ng-click="createCategory();">Remover uma categoria</button>
 		</div>
 
 		<div class="bar bar-footer bar-balanced" ng-if="actionType.type === 'copy'" ng-click="saveNewTask();">
@@ -53,7 +52,7 @@
 				<i class="icon ion-archive" style="font-size:45px;"></i>
 			</div>
 		</div>
-		<div class="bar bar-footer bar-balanced" ng-if="actionType.type === 'edit'" ng-click="saveNewTask();">
+		<div class="bar bar-footer bar-balanced" ng-if="actionType.type === 'edit'" ng-click="editTask();">
 			<div class="title">
 				<i class="icon ion-edit" style="font-size:35px;"></i>
 			</div>

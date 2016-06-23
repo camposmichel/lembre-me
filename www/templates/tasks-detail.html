@@ -1,16 +1,19 @@
-<ion-view view-title="Faltam 2 dias">
-
+<ion-view>
   <ion-content class="padding">
-    <h2 class="title">#{{task.id}} {{task.title}}</h2>
+    <h2 class="title">{{task.title}}</h2>
     <small>
       {{task.startDate | date:'dd/MM/yyyy'}} - {{task.endDate | date:'dd/MM/yyyy'}}
     </small>
-    <br>
-    <img ng-src="./img/ionic.png" style="width: 64px; height: 64px">
-    <br>
-    <p>
-      {{task.notes}}
+    <hr>
+    <p style="font-size: 20px;">
+      {{task.message}}
     </p>
+    <br>
+    <div style="text-align:center">
+      <i class="icon ion-image" style="font-size: 200px;"></i>
+      <br>
+      <small>Adicione uma imagem para sua tarefa</small>
+    </div>
   </ion-content>
 
   <div class="tabs tabs-icon-only tabsTaskDetails">
